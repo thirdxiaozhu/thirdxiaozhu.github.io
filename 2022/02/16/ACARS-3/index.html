@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/goose32x32.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/goose16x16.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="何为软件定义无线电软件定义的无线电 （SDR） 是无线电广播通信技术，它基于软件定义的无线通信协议而非通过硬连线实现。换言之，频带、空中接口协议和功能可通过软件下载和更新来升级，而不用完全更换硬件。它是针对构建多模式、多频和多功能无线通信设备的问题提供有效而安全的解决方案。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="航空甚高频ACARS信号调制（3）—— 软件定义无线电">
+<meta property="og:url" content="http://example.com/2022/02/16/ACARS-3/index.html">
+<meta property="og:site_name" content="鹅窝">
+<meta property="og:description" content="何为软件定义无线电软件定义的无线电 （SDR） 是无线电广播通信技术，它基于软件定义的无线通信协议而非通过硬连线实现。换言之，频带、空中接口协议和功能可通过软件下载和更新来升级，而不用完全更换硬件。它是针对构建多模式、多频和多功能无线通信设备的问题提供有效而安全的解决方案。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/hackrf.jpeg">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/rtlsdr.jpeg">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-option.png">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-variable.png">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-filesource.png">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-filesink.png">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-repeat.png">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-throttle.png">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-cts.png">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-signal%20source.png">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-multpy.png">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-subtract.png">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-osmosink.png">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-bandpassfiliter.png">
+<meta property="article:published_time" content="2022-02-16T13:41:52.000Z">
+<meta property="article:modified_time" content="2022-02-19T10:08:53.138Z">
+<meta property="article:author" content="thirdxiaozhu">
+<meta property="article:tag" content="通信">
+<meta property="article:tag" content="无线电">
+<meta property="article:tag" content="ACARS">
+<meta property="article:tag" content="VHF">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/hackrf.jpeg">
+
+<link rel="canonical" href="http://example.com/2022/02/16/ACARS-3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>航空甚高频ACARS信号调制（3）—— 软件定义无线电 | 鹅窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">鹅窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">1</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">3</span></a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/02/16/ACARS-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/1495_1644831403_hd.jpeg">
+      <meta itemprop="name" content="thirdxiaozhu">
+      <meta itemprop="description" content="嘎">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="鹅窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          航空甚高频ACARS信号调制（3）—— 软件定义无线电
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-02-16 21:41:52" itemprop="dateCreated datePublished" datetime="2022-02-16T21:41:52+08:00">2022-02-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-02-19 18:08:53" itemprop="dateModified" datetime="2022-02-19T18:08:53+08:00">2022-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%80%9A%E4%BF%A1/" itemprop="url" rel="index"><span itemprop="name">通信</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="何为软件定义无线电"><a href="#何为软件定义无线电" class="headerlink" title="何为软件定义无线电"></a>何为软件定义无线电</h2><p>软件定义的无线电 （SDR） 是无线电广播通信技术，它基于软件定义的无线通信协议而非通过硬连线实现。换言之，频带、空中接口协议和功能可通过软件下载和更新来升级，而不用完全更换硬件。它是针对构建多模式、多频和多功能无线通信设备的问题提供有效而安全的解决方案。</p>
+<span id="more"></span>
+<hr>
+<h2 id="软件无线电设备"><a href="#软件无线电设备" class="headerlink" title="软件无线电设备"></a>软件无线电设备</h2><p>软件无线电设备的种类有很多，包括单工的RTL-SDR，半双工的HackRF，全双工的LimeSDR等，本文主要应用HackRF和RTL-SDR进行实验。</p>
+<h3 id="HackRF-One"><a href="#HackRF-One" class="headerlink" title="HackRF One"></a>HackRF One</h3><p>HackRF One 是一款软件无线电外设，能够传输或接收 1 MHz 至 6 GHz 的无线电信号。HackRF One 旨在支持现代和下一代无线电技术的测试和开发，是一个开源硬件平台，可用作 USB 外围设备或编程用于独立操作。</p>
+<p>更具体参数包括:</p>
+<ul>
+<li>1 MHz 至 6 GHz 工作频率</li>
+<li>半双工收发器</li>
+<li>每秒高达 2000 万个样本</li>
+<li>8 位正交样本（8 位 I 和 8 位 Q）</li>
+<li>与 GNU Radio、SDR# 等兼容</li>
+<li>软件可配置 RX 和 TX 增益和基带滤波器</li>
+<li>软件控制的天线端口功率（3.3 V 时为 50 mA）</li>
+<li>SMA 母天线连接器</li>
+<li>用于同步的 SMA 母时钟输入和输出</li>
+<li>方便的编程按钮</li>
+<li>用于扩展的内部排针</li>
+<li>USB 2.0、供电</li>
+<li>开源</li>
+</ul>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/hackrf.jpeg" alt="hackrf"></p>
+<p>关于Hackrf的更多信息：<a target="_blank" rel="noopener" href="https://greatscottgadgets.com/hackrf/one/">HackRF One</a></p>
+<h3 id="RTL-SDR"><a href="#RTL-SDR" class="headerlink" title="RTL-SDR"></a>RTL-SDR</h3><p>RTL-SDR 是一款非常便宜的加密狗 ，可用作基于计算机的无线电扫描仪，用于接收您所在地区的实时无线电信号（无需互联网）。根据特定型号，它可以接收从 500 kHz 到 1.75 GHz 的频率。RTL-SDR 的大多数软件也是社区开发的，并且免费提供。<br>RTL-SDR 的起源源于基于 RTL2832U 芯片组的量产 DVB-T 电视调谐器加密狗。RTL2832U 芯片组上的原始 I/Q 数据可以直接访问，这使得 DVB-T 电视调谐器可以转换为通过自定义软件驱动程序实现宽带软件定义无线电。</p>
+<p><a target="_blank" rel="noopener" href="https://www.rtl-sdr.com/about-rtl-sdr/">Rtl-Sdr</a></p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/rtlsdr.jpeg" alt="Rtl-Sdr"></p>
+<h2 id="GNU-Radio"><a href="#GNU-Radio" class="headerlink" title="GNU Radio"></a>GNU Radio</h2><h3 id="什么是GNU-Radio"><a href="#什么是GNU-Radio" class="headerlink" title="什么是GNU Radio"></a>什么是GNU Radio</h3><p>GNU Radio是一个自由软件开发工具包，提供实现软件无线电和信号处理的信号处理模块系统。 它可以与外部RF硬件一起使用来发送软件无线电，或者在没有硬件的情况下于拟真环境运行。 它被无线电爱好者、高校研究人员以及商业领域广泛用于支援无线通信研究和现实世界的无线电系统。</p>
+<h3 id="GNU-Radio能干什么"><a href="#GNU-Radio能干什么" class="headerlink" title="GNU Radio能干什么"></a>GNU Radio能干什么</h3><p>GNU Radio软件提供了构建和运行软件无线电或仅用于通用信号处理应用程序的框架和工具。 GNU Radio应用程序本身通常称为“流程图”，它是连接在一起的一系列信号处理块，从而描述了数据流。</p>
+<p>与所有软件定义的无线电系统一样，可重配置性是一个关键特性。不为特定但不同目的而设计的不同无线电，而是使用单个通用无线电，该信号处理软件（这里指代GNU Radio）是处理无线电专用的处理应用。</p>
+<p>这些流程图可以用C++或Python编程语言编写 。 GNU Radio基础结构完全用C++编写，而许多用户工具都是用Python编写的。</p>
+<p>我们将使用GNURadio构建流图。</p>
+<h3 id="一些可能用到的模块"><a href="#一些可能用到的模块" class="headerlink" title="一些可能用到的模块"></a>一些可能用到的模块</h3><ul>
+<li><p>Option模块</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-option.png" alt="option"></p>
+<p>一些基础设置，例如设置标题、作者、版权等信息，相对重要的设置是选择渲染GUI的库（Generate Options)。在GNU Radio3.8中，引入了选择导出语言选项（Output Language），有Python3和C++可供选择。</p>
+</li>
+<li><p>Variable模块</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-variable.png" alt="variable"></p>
+<p>将某一值映射到唯一变量，在其他模块调用该值时，可以直接使用映射的变量名。</p>
+<p>更多信息：<a target="_blank" rel="noopener" href="https://wiki.gnuradio.org/index.php?title=Variable">GNU RadioWiki Variable</a></p>
+</li>
+<li><p>File Source模块</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-filesource.png" alt="File Source"></p>
+<p>从文件中以二进制格式读取文件，文件长度不能低于八个字节。这里可以选择是否重复读取文件。</p>
+<p>更多信息：<a target="_blank" rel="noopener" href="https://wiki.gnuradio.org/index.php?title=File_Source">GNU RadioWiki File Source</a></p>
+</li>
+<li><p>File Sink模块</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-filesink.png" alt="File Sink"></p>
+<p>写入二进制文件</p>
+<p>更多信息：<a target="_blank" rel="noopener" href="https://wiki.gnuradio.org/index.php?title=File_Sink">GNU RadioWiki File Sink</a></p>
+</li>
+<li><p>Repeat模块</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-repeat.png" alt="Repeat"></p>
+<p>对每个二进制位进行Interpolation次插值。</p>
+<p>更多信息：<a target="_blank" rel="noopener" href="https://wiki.gnuradio.org/index.php?title=Repeat">GNU RadioWiki Repeat</a></p>
+</li>
+<li><p>Throttle模块</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-throttle.png" alt="Throttle"></p>
+<p>用于节流，使平均速率不超过设定的速率。当流图中包括用于输入输出的硬件设备时不必使用该模块。这个模块的目的是在仿真时减轻计算机负担。</p>
+<p>更多信息：<a target="_blank" rel="noopener" href="https://wiki.gnuradio.org/index.php?title=Throttle">GNU RadioWiki Repeat</a></p>
+</li>
+<li><p>Chunks to Symbles模块</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-cts.png" alt="Chunks to Symbol"></p>
+<p>将输入的字节按Dimension维映射到Symbol Table，输出浮点数或复数。具体公式为：</p>
+<p>$out[i\times d+k]=symbolTable[in[i]\times d + k]  ,   k=0,1,2…d-1$ </p>
+<p>例如，对于一个这样的字节流:</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">[0,1,2,3]</span></span><br></pre></td></tr></table></figure>
+<p>以以下方式映射：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Dimension</span>=<span class="number">2</span>，Symbol Table=[<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>]</span><br></pre></td></tr></table></figure>
+<p>那么，输出的就是：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">0,1,2,3</span>,<span class="number">4,5,6,7</span>]</span><br></pre></td></tr></table></figure>
+<p>更多信息：<a target="_blank" rel="noopener" href="https://wiki.gnuradio.org/index.php?title=Chunks_to_Symbols">GNU RadioWiki Chunks to Symbols</a></p>
+</li>
+<li><p>Signal Source模块</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-signal%20source.png" alt="Signal Source"></p>
+<p>用以产生波形的信号发生器，这里可以选择多种波形，包括：</p>
+<ul>
+<li>恒波</li>
+<li>正弦波</li>
+<li>余弦波</li>
+<li>方波</li>
+<li>三角波</li>
+<li>锯齿波</li>
+</ul>
+<p>注意：这里指定的频率不需要包括$2\pi$</p>
+<p>更多信息：<a target="_blank" rel="noopener" href="https://wiki.gnuradio.org/index.php?title=Signal_Source">GNU RadioWiki Signal Source</a></p>
+</li>
+<li><p>Multiply模块</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-multpy.png" alt="Multiply"></p>
+<p>将所有输入流相乘，可以自定义输入端口个数。</p>
+</li>
+<li><p>Subtract模块</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-subtract.png" alt="Subtract"></p>
+<p>输入端口依次相减</p>
+</li>
+</ul>
+<p>  <a target="_blank" rel="noopener" href="https://wiki.gnuradio.org/index.php?title=Subtract">Subtract</a></p>
+<ul>
+<li><p>osmocom Sink模块</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-osmosink.png" alt="osmocom sink"></p>
+<p>Osmocom开发的Gnu Raio功能模块，用以将流图处理过的内容通过支持OsmoSDR的硬件发送出去。仅支持复数类型。</p>
+<p><a target="_blank" rel="noopener" href="https://osmocom.org/projects/gr-osmosdr/wiki">osmocom Sink</a></p>
+</li>
+<li><p>Band Pass Filter模块</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/gnuradio/grc-bandpassfiliter.png" alt="Band Pass Filter"></p>
+<p>带通滤波器，早期版本的Gnu Radio并无此模块，可以在Decimating FIR Filter模块中使用以下抽头做替代。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">firdes.band<span class="constructor">_pass()</span></span><br></pre></td></tr></table></figure>
+<p>使用傅里叶模块代替时，频率单位有区别，需要特别注意。</p>
+<p><a target="_blank" rel="noopener" href="https://wiki.gnuradio.org/index.php/Band_Pass_Filter">Band Pass Filter</a></p>
+</li>
+</ul>
+<p>更多模块参看：<a href="">链接</a></p>
+<h2 id="下一部分将使用上面介绍的模块搭建流图并尝试调制ACARS报文"><a href="#下一部分将使用上面介绍的模块搭建流图并尝试调制ACARS报文" class="headerlink" title="下一部分将使用上面介绍的模块搭建流图并尝试调制ACARS报文"></a>下一部分将使用上面介绍的模块搭建流图并尝试调制ACARS报文</h2>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>thirdxiaozhu
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2022/02/16/ACARS-3/" title="航空甚高频ACARS信号调制（3）—— 软件定义无线电">http://example.com/2022/02/16/ACARS-3/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%80%9A%E4%BF%A1/" rel="tag"># 通信</a>
+              <a href="/tags/%E6%97%A0%E7%BA%BF%E7%94%B5/" rel="tag"># 无线电</a>
+              <a href="/tags/ACARS/" rel="tag"># ACARS</a>
+              <a href="/tags/VHF/" rel="tag"># VHF</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/02/16/ACARS-2/" rel="prev" title="航空甚高频ACARS信号调制（2）—— MSK调制">
+      <i class="fa fa-chevron-left"></i> 航空甚高频ACARS信号调制（2）—— MSK调制
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E4%B8%BA%E8%BD%AF%E4%BB%B6%E5%AE%9A%E4%B9%89%E6%97%A0%E7%BA%BF%E7%94%B5"><span class="nav-number">1.</span> <span class="nav-text">何为软件定义无线电</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6%E6%97%A0%E7%BA%BF%E7%94%B5%E8%AE%BE%E5%A4%87"><span class="nav-number">2.</span> <span class="nav-text">软件无线电设备</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HackRF-One"><span class="nav-number">2.1.</span> <span class="nav-text">HackRF One</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTL-SDR"><span class="nav-number">2.2.</span> <span class="nav-text">RTL-SDR</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GNU-Radio"><span class="nav-number">3.</span> <span class="nav-text">GNU Radio</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFGNU-Radio"><span class="nav-number">3.1.</span> <span class="nav-text">什么是GNU Radio</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GNU-Radio%E8%83%BD%E5%B9%B2%E4%BB%80%E4%B9%88"><span class="nav-number">3.2.</span> <span class="nav-text">GNU Radio能干什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E5%8F%AF%E8%83%BD%E7%94%A8%E5%88%B0%E7%9A%84%E6%A8%A1%E5%9D%97"><span class="nav-number">3.3.</span> <span class="nav-text">一些可能用到的模块</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E4%B8%80%E9%83%A8%E5%88%86%E5%B0%86%E4%BD%BF%E7%94%A8%E4%B8%8A%E9%9D%A2%E4%BB%8B%E7%BB%8D%E7%9A%84%E6%A8%A1%E5%9D%97%E6%90%AD%E5%BB%BA%E6%B5%81%E5%9B%BE%E5%B9%B6%E5%B0%9D%E8%AF%95%E8%B0%83%E5%88%B6ACARS%E6%8A%A5%E6%96%87"><span class="nav-number">4.</span> <span class="nav-text">下一部分将使用上面介绍的模块搭建流图并尝试调制ACARS报文</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="thirdxiaozhu"
+      src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/1495_1644831403_hd.jpeg">
+  <p class="site-author-name" itemprop="name">thirdxiaozhu</p>
+  <div class="site-description" itemprop="description">嘎</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/thirdxiaozhu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;thirdxiaozhu" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/zoujiaxv7891@gmail.com" title="E-Mail → zoujiaxv7891@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/users/18178995/%e9%82%b9%e5%98%89%e6%97%ad" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;users&#x2F;18178995&#x2F;%e9%82%b9%e5%98%89%e6%97%ad" rel="noopener" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">邹嘉旭</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">12k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">11 分钟</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="//cdn.jsdelivr.net/gh/theme-next/theme-next-canvas-ribbon@1/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>
