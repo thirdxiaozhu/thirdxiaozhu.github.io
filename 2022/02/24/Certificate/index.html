@@ -30,7 +30,7 @@
 <meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/fig3.png">
 <meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/fig2.png">
 <meta property="article:published_time" content="2022-02-24T11:38:30.000Z">
-<meta property="article:modified_time" content="2022-03-04T03:10:58.062Z">
+<meta property="article:modified_time" content="2022-03-04T03:12:20.576Z">
 <meta property="article:author" content="thirdxiaozhu">
 <meta property="article:tag" content="网络安全">
 <meta property="article:tag" content="非对称加密">
@@ -201,7 +201,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-04 11:10:58" itemprop="dateModified" datetime="2022-03-04T11:10:58+08:00">2022-03-04</time>
+                <time title="修改时间：2022-03-04 11:12:20" itemprop="dateModified" datetime="2022-03-04T11:12:20+08:00">2022-03-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -226,7 +226,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.3k</span>
+              <span>1.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -293,7 +293,7 @@
 <h3 id="数字证书颁发过程"><a href="#数字证书颁发过程" class="headerlink" title="数字证书颁发过程"></a>数字证书颁发过程</h3><p>权威数字证书颁发机构各自拥有一对自己的公私钥对，私钥由机构自己持有，公钥制作为自签名的数字证书，即根证书，软件厂商将这些权威机构的根证书置为可信。</p>
 <p>建立Https连接，需要服务端获取一份自己的数字证书，那么需要先使用openssl生成一对自己的公私钥对，根据该公钥以及服务端相关信息生成向CA提交的CSR（Certificate Signing Request，证书签名申请）。在CA证实服务端信息之后，对该信息进行散列，并将获得的散列值使用CA私钥进行加密。之后将密文、服务器公钥、服务器信息制作成一个证书，返回给服务端。</p>
 <p>在建立Https协商时，服务端传送给客户端的就是这个CA签发的数字证书。</p>
-<p>客户端获得服务端的数字证书后，根据</p>
+<p>客户端获得服务端的数字证书后，根据浏览器中安装的CA数字证书</p>
 
     </div>
 
