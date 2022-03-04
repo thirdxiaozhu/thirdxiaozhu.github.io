@@ -30,7 +30,7 @@
 <meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/fig3.png">
 <meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/fig2.png">
 <meta property="article:published_time" content="2022-02-24T11:38:30.000Z">
-<meta property="article:modified_time" content="2022-02-25T14:16:46.087Z">
+<meta property="article:modified_time" content="2022-03-04T03:10:58.062Z">
 <meta property="article:author" content="thirdxiaozhu">
 <meta property="article:tag" content="网络安全">
 <meta property="article:tag" content="非对称加密">
@@ -201,7 +201,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-02-25 22:16:46" itemprop="dateModified" datetime="2022-02-25T22:16:46+08:00">2022-02-25</time>
+                <time title="修改时间：2022-03-04 11:10:58" itemprop="dateModified" datetime="2022-03-04T11:10:58+08:00">2022-03-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -226,7 +226,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>902</span>
+              <span>1.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -257,7 +257,8 @@
 <li>保密性：数字签名本身不具有保密性质，如果需要可以进行加密。</li>
 <li>完整性</li>
 </ul>
-<h3 id="数字签名过程"><a href="#数字签名过程" class="headerlink" title="数字签名过程"></a>数字签名过程</h3><p>一种空地数据链上行报文验证过程可供参考。</p>
+<h3 id="数字签名过程"><a href="#数字签名过程" class="headerlink" title="数字签名过程"></a>数字签名过程</h3><p>通俗来讲，数字签名就是发送方使用自己持有的私钥对报文散列后的哈希值进行加密，然后将报文和密文一起发送给接收方，接收方使用发送方的公开公钥对密文进行解密，得到某值，将该值和将报文散列后的哈希值进行对比，如果一致，那么就证明该信息是从发送方发送的。</p>
+<p>一种空地数据链上行报文验证过程可供参考。</p>
 <p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/fig3.png" alt=""></p>
 <h2 id="数字证书"><a href="#数字证书" class="headerlink" title="数字证书"></a>数字证书</h2><h3 id="什么是数字证书"><a href="#什么是数字证书" class="headerlink" title="什么是数字证书"></a>什么是数字证书</h3><p>根据上面数字签名的内容，我们知道数字认证的核心就是数字签名，数字签名的核心就是公私钥对，那么，在面对一个陌生的发送者的时候，怎么才能知道对面是一个“好人”，而非一个潜在的攻击者呢？这就需要由权威的第三方颁发的证明文件以提供对方的身份的证明，这个文件就是数字证书，而“权威的第三方”就是CA（Certificate Authority），电子认证服务机构，从CA成立到建立安全信道这一系列过程全部包含在PKI内。</p>
 <h3 id="PKI（公钥基础设施）"><a href="#PKI（公钥基础设施）" class="headerlink" title="PKI（公钥基础设施）"></a>PKI（公钥基础设施）</h3><p>公钥基础设施是一个包括硬件、软件、人员、策略和规程的集合，用来实现基于公钥密码体制的密钥和证书的产生、管理、存储、分发和撤销等功能。</p>
@@ -285,11 +286,15 @@
 </li>
 <li><p>证书所有人的公开密钥 <strong><em>（核心）</em></strong>；</p>
 </li>
-<li><p>证书发行者对证书的签名。</p>
+<li><p>证书发行者对证书的数字签名。</p>
 </li>
 </ul>
 <p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/fig2.png" alt="数字证书"></p>
-<h3 id="数字证书颁发过程"><a href="#数字证书颁发过程" class="headerlink" title="数字证书颁发过程"></a>数字证书颁发过程</h3>
+<h3 id="数字证书颁发过程"><a href="#数字证书颁发过程" class="headerlink" title="数字证书颁发过程"></a>数字证书颁发过程</h3><p>权威数字证书颁发机构各自拥有一对自己的公私钥对，私钥由机构自己持有，公钥制作为自签名的数字证书，即根证书，软件厂商将这些权威机构的根证书置为可信。</p>
+<p>建立Https连接，需要服务端获取一份自己的数字证书，那么需要先使用openssl生成一对自己的公私钥对，根据该公钥以及服务端相关信息生成向CA提交的CSR（Certificate Signing Request，证书签名申请）。在CA证实服务端信息之后，对该信息进行散列，并将获得的散列值使用CA私钥进行加密。之后将密文、服务器公钥、服务器信息制作成一个证书，返回给服务端。</p>
+<p>在建立Https协商时，服务端传送给客户端的就是这个CA签发的数字证书。</p>
+<p>客户端获得服务端的数字证书后，根据</p>
+
     </div>
 
     
@@ -467,7 +472,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">14k</span>
+    <span title="站点总字数">15k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
