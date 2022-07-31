@@ -20,25 +20,25 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="数字签名什么是数字签名？数字签名是附加在原始信息上一些数据。通过这些数据，可以使接收人确认信息来源，以及鉴别信息完整性，防止信息伪造。数字签名基于公钥密码体制或私钥密码体制，前者较为常见。 数字签名特点传输信息的每一方都有一对相关密钥，其中，私钥由发送者保存，发送时用私钥密钥对预发送信息进行签名；公钥由对外公布，信息接收者使用公钥对收到的签名和信息进行验证，以证明信息是由发送者发送的。数字签名的内">
+  <meta name="description" content="在系列博客（3）中，初步介绍了软件定义无线电中两款便宜、可靠的SDR设备：HackRF One、RTL-SDR，并给出了gnuradio中简单模块的使用。本篇将在此基础上更进一步，介绍SDR设备和软件所使用的数据格式，并给出相应分析数据的python代码。 HackRF One在2014年的版本更新中，HackRF所使用的数据类型从无符号8bit整型（uint8）改为有符号8bit整型（int8）">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数字认证">
-<meta property="og:url" content="http://example.com/2022/02/24/Certificate/index.html">
+<meta property="og:title" content="航空甚高频ACARS信号调制（5）—— 再谈SDR">
+<meta property="og:url" content="http://example.com/2022/07/31/ACARS-5/index.html">
 <meta property="og:site_name" content="鹅窝">
-<meta property="og:description" content="数字签名什么是数字签名？数字签名是附加在原始信息上一些数据。通过这些数据，可以使接收人确认信息来源，以及鉴别信息完整性，防止信息伪造。数字签名基于公钥密码体制或私钥密码体制，前者较为常见。 数字签名特点传输信息的每一方都有一对相关密钥，其中，私钥由发送者保存，发送时用私钥密钥对预发送信息进行签名；公钥由对外公布，信息接收者使用公钥对收到的签名和信息进行验证，以证明信息是由发送者发送的。数字签名的内">
+<meta property="og:description" content="在系列博客（3）中，初步介绍了软件定义无线电中两款便宜、可靠的SDR设备：HackRF One、RTL-SDR，并给出了gnuradio中简单模块的使用。本篇将在此基础上更进一步，介绍SDR设备和软件所使用的数据格式，并给出相应分析数据的python代码。 HackRF One在2014年的版本更新中，HackRF所使用的数据类型从无符号8bit整型（uint8）改为有符号8bit整型（int8）">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/fig3.png">
-<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/fig2.png">
-<meta property="article:published_time" content="2022-02-24T11:38:30.000Z">
-<meta property="article:modified_time" content="2022-03-04T04:56:30.645Z">
+<meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/5/hackrf_trans.png">
+<meta property="article:published_time" content="2022-07-31T14:54:11.000Z">
+<meta property="article:modified_time" content="2022-07-31T15:36:44.221Z">
 <meta property="article:author" content="thirdxiaozhu">
-<meta property="article:tag" content="网络安全">
-<meta property="article:tag" content="非对称加密">
-<meta property="article:tag" content="散列">
+<meta property="article:tag" content="通信">
+<meta property="article:tag" content="无线电">
+<meta property="article:tag" content="ACARS">
+<meta property="article:tag" content="VHF">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/fig3.png">
+<meta name="twitter:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/5/hackrf_trans.png">
 
-<link rel="canonical" href="http://example.com/2022/02/24/Certificate/">
+<link rel="canonical" href="http://example.com/2022/07/31/ACARS-5/">
 
 
 <script id="page-configurations">
@@ -51,7 +51,7 @@
   };
 </script>
 
-  <title>数字认证 | 鹅窝</title>
+  <title>航空甚高频ACARS信号调制（5）—— 再谈SDR | 鹅窝</title>
   
 
 
@@ -171,7 +171,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/02/24/Certificate/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/07/31/ACARS-5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/1495_1644831403_hd.jpeg">
@@ -184,7 +184,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          数字认证
+          航空甚高频ACARS信号调制（5）—— 再谈SDR
         </h1>
 
         <div class="post-meta">
@@ -193,23 +193,17 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2022-02-24 19:38:30" itemprop="dateCreated datePublished" datetime="2022-02-24T19:38:30+08:00">2022-02-24</time>
+              <time title="创建时间：2022-07-31 22:54:11 / 修改时间：23:36:44" itemprop="dateCreated datePublished" datetime="2022-07-31T22:54:11+08:00">2022-07-31</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-04 12:56:30" itemprop="dateModified" datetime="2022-03-04T12:56:30+08:00">2022-03-04</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+                  <a href="/categories/%E9%80%9A%E4%BF%A1/" itemprop="url" rel="index"><span itemprop="name">通信</span></a>
                 </span>
             </span>
 
@@ -226,7 +220,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.5k</span>
+              <span>1k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -245,57 +239,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="数字签名"><a href="#数字签名" class="headerlink" title="数字签名"></a>数字签名</h2><h3 id="什么是数字签名？"><a href="#什么是数字签名？" class="headerlink" title="什么是数字签名？"></a>什么是数字签名？</h3><p>数字签名是附加在原始信息上一些数据。通过这些数据，可以使接收人确认信息来源，以及鉴别信息完整性，防止信息伪造。数字签名基于公钥密码体制或私钥密码体制，前者较为常见。</p>
-<h3 id="数字签名特点"><a href="#数字签名特点" class="headerlink" title="数字签名特点"></a>数字签名特点</h3><p>传输信息的每一方都有一对相关密钥，其中，私钥由发送者保存，发送时用私钥密钥对预发送信息进行签名；公钥由对外公布，信息接收者使用公钥对收到的签名和信息进行验证，以证明信息是由发送者发送的。数字签名的内容多为私钥加密后的原始信息杂凑值。</p>
-<span id="more"></span>
-<h3 id="数字签名的功能"><a href="#数字签名的功能" class="headerlink" title="数字签名的功能"></a>数字签名的功能</h3><ul>
-<li>防伪造：私钥只有发送着自己持有，别人无法伪造出和发送者公钥相对应的私钥。</li>
-<li>身份鉴别：同上</li>
-<li>防篡改</li>
-<li>防止重放：对签名信息加上时间戳等唯一标识符可以有效防范重放。</li>
-<li>抗抵赖：由于数字签名不可能冒充伪造，那么签名者就无法抵赖。</li>
-<li>保密性：数字签名本身不具有保密性质，如果需要可以进行加密。</li>
-<li>完整性</li>
-</ul>
-<h3 id="数字签名过程"><a href="#数字签名过程" class="headerlink" title="数字签名过程"></a>数字签名过程</h3><p>通俗来讲，数字签名就是发送方使用自己持有的私钥对报文散列后的哈希值进行加密，然后将报文和密文一起发送给接收方，接收方使用发送方的公开公钥对密文进行解密，得到某值，将该值和将报文散列后的哈希值进行对比，如果一致，那么就证明该信息是从发送方发送的。</p>
-<p>一种空地数据链上行报文验证过程可供参考。</p>
-<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/fig3.png" alt=""></p>
-<h2 id="数字证书"><a href="#数字证书" class="headerlink" title="数字证书"></a>数字证书</h2><h3 id="什么是数字证书"><a href="#什么是数字证书" class="headerlink" title="什么是数字证书"></a>什么是数字证书</h3><p>根据上面数字签名的内容，我们知道数字认证的核心就是数字签名，数字签名的核心就是公私钥对，那么，在面对一个陌生的发送者的时候，怎么才能知道对面是一个“好人”，而非一个潜在的攻击者呢？这就需要由权威的第三方颁发的证明文件以提供对方的身份的证明，这个文件就是数字证书，而“权威的第三方”就是CA（Certificate Authority），电子认证服务机构，从CA成立到建立安全信道这一系列过程全部包含在PKI内。</p>
-<h3 id="PKI（公钥基础设施）"><a href="#PKI（公钥基础设施）" class="headerlink" title="PKI（公钥基础设施）"></a>PKI（公钥基础设施）</h3><p>公钥基础设施是一个包括硬件、软件、人员、策略和规程的集合，用来实现基于公钥密码体制的密钥和证书的产生、管理、存储、分发和撤销等功能。</p>
-<p>一个典型的PKI系统包括了：</p>
-<ul>
-<li>安全策略</li>
-<li>证书机构CA</li>
-<li>注册机构RA</li>
-<li>发布系统</li>
-<li>具体应用</li>
-</ul>
-<p>更具体的内容可参考：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/30136885">知乎-5分钟让你知道什么是PKI</a></p>
-<h3 id="数字证书的内容"><a href="#数字证书的内容" class="headerlink" title="数字证书的内容"></a>数字证书的内容</h3><ul>
-<li><p>证书的版本信息；</p>
-</li>
-<li><p>证书的序列号，每个证书都有一个唯一的证书序列号；</p>
-</li>
-<li><p>证书所使用的签名算法；</p>
-</li>
-<li><p>证书的发行机构名称，命名规则一般采用X.500格式；</p>
-</li>
-<li><p>证书的有效期，通用的证书一般采用UTC时间格式；</p>
-</li>
-<li><p>证书所有人的名称，命名规则一般采用X.500格式；</p>
-</li>
-<li><p>证书所有人的公开密钥 <strong><em>（核心）</em></strong>；</p>
-</li>
-<li><p>证书发行者对证书的数字签名。</p>
-</li>
-</ul>
-<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/fig2.png" alt="数字证书"></p>
-<h3 id="Https中的数字证书颁发过程"><a href="#Https中的数字证书颁发过程" class="headerlink" title="Https中的数字证书颁发过程"></a>Https中的数字证书颁发过程</h3><p>权威数字证书颁发机构各自拥有一对自己的公私钥对，私钥由机构自己持有，公钥制作为自签名的数字证书，即根证书，软件厂商将这些权威机构的根证书置为可信。</p>
-<p>建立Https连接，需要服务端获取一份自己的数字证书，那么需要先使用openssl生成一对自己的公私钥对，根据该公钥以及服务端相关信息生成向CA提交的CSR（Certificate Signing Request，证书签名申请）。在CA证实服务端信息之后，对该信息进行散列，并将获得的散列值使用CA私钥进行加密。之后将密文、服务端公钥、服务器端信息制作一个如上图中X.509格式的证书，返回给服务端。</p>
-<p>Https协商时，服务端传送给客户端的就是这个CA签发的CRT证书。</p>
-<p>客户端获得服务端的CRT证书后，进行拆解，拆解为出服务端信息、服务端公钥和CA签名信息。利用CA声明的散列算法对服务端信息进行散列，得到哈希值。根据浏览器中安装的CA根证书提取出CA公钥，将签名信息使用该公钥解密并和上一步得到的哈希值进行对比，如果相同，说明证书有效，可以使用其中的服务端公钥建立Https连接。</p>
-<p><a target="_blank" rel="noopener" href="http://49.232.147.37/2022/02/24/HTTPS/#more">Https相关内容</a></p>
-
+        <p>在系列博客（3）中，初步介绍了软件定义无线电中两款便宜、可靠的SDR设备：HackRF One、RTL-SDR，并给出了gnuradio中简单模块的使用。本篇将在此基础上更进一步，介绍SDR设备和软件所使用的数据格式，并给出相应分析数据的python代码。</p>
+<h2 id="HackRF-One"><a href="#HackRF-One" class="headerlink" title="HackRF One"></a>HackRF One</h2><p>在2014年的版本更新中，HackRF所使用的数据类型从无符号8bit整型（uint8）改为有符号8bit整型（int8），此后版本一致沿用此类型。HackRF处理的数据由IQ样本交替构成，即，两个样本为一组，第一个样本为复数实部I，第二个样本是复数虚部Q，这也解释了为什么在使用hackrf_transfer发送或接收数据时，每秒处理的样本数为采样率的两倍。</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/5/hackrf_trans.png" alt="两倍"></p>
+<p>需要注意，HackRF数据以补码形式进行存储。</p>
+<p>下面给出存储HackRF数据代码。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">intToBin</span>(<span class="params">number</span>):</span><br><span class="line">    <span class="keyword">if</span>(number&gt;=<span class="number">0</span>):</span><br><span class="line">        b=<span class="built_in">bin</span>(number)</span><br><span class="line">        b = <span class="string">&#x27;0&#x27;</span> * (<span class="number">8</span>+<span class="number">2</span> - <span class="built_in">len</span>(b)) + b</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        b=<span class="number">2</span>**(<span class="number">8</span>)+number</span><br><span class="line">        b=<span class="built_in">bin</span>(b)</span><br><span class="line">        b = <span class="string">&#x27;1&#x27;</span> * (<span class="number">8</span>+<span class="number">2</span> - <span class="built_in">len</span>(b)) + b    <span class="comment">#注意这里算出来的结果是补码</span></span><br><span class="line">    b=b.replace(<span class="string">&quot;0b&quot;</span>,<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">    b=b.replace(<span class="string">&#x27;-&#x27;</span>,<span class="string">&#x27;&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> b</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">int8_to_unsigned_hex</span>(<span class="params">integer</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">chr</span>(integer).encode(<span class="string">&#x27;latin1&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">iqFile = <span class="built_in">open</span>(<span class="string">&quot;/home/jiaxv/inoproject/msk/acarsgen/int8.cs8&quot;</span>,<span class="string">&quot;wb&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(I)):</span><br><span class="line">    <span class="comment">####   补码  ###</span></span><br><span class="line">    i_complement = intToBin(<span class="built_in">int</span>(I[i]))</span><br><span class="line">    q_complement = intToBin(<span class="built_in">int</span>(Q[i]))</span><br><span class="line">    iqFile.write(int8_to_unsigned_hex(<span class="built_in">int</span>(i_complement, <span class="number">2</span>)))</span><br><span class="line">    iqFile.write(int8_to_unsigned_hex(<span class="built_in">int</span>(q_complement, <span class="number">2</span>)))</span><br><span class="line"></span><br><span class="line">iqFile.close()</span><br></pre></td></tr></table></figure>
+<h2 id="RTL-SDR"><a href="#RTL-SDR" class="headerlink" title="RTL-SDR"></a>RTL-SDR</h2>
     </div>
 
     
@@ -310,7 +260,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://example.com/2022/02/24/Certificate/" title="数字认证">http://example.com/2022/02/24/Certificate/</a>
+    <a href="http://example.com/2022/07/31/ACARS-5/" title="航空甚高频ACARS信号调制（5）—— 再谈SDR">http://example.com/2022/07/31/ACARS-5/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -321,9 +271,10 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" rel="tag"># 网络安全</a>
-              <a href="/tags/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86/" rel="tag"># 非对称加密</a>
-              <a href="/tags/%E6%95%A3%E5%88%97/" rel="tag"># 散列</a>
+              <a href="/tags/%E9%80%9A%E4%BF%A1/" rel="tag"># 通信</a>
+              <a href="/tags/%E6%97%A0%E7%BA%BF%E7%94%B5/" rel="tag"># 无线电</a>
+              <a href="/tags/ACARS/" rel="tag"># ACARS</a>
+              <a href="/tags/VHF/" rel="tag"># VHF</a>
           </div>
 
         
@@ -332,13 +283,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/02/24/HTTPS/" rel="prev" title="Https协议详解">
-      <i class="fa fa-chevron-left"></i> Https协议详解
+    <a href="/2022/02/24/Certificate/" rel="prev" title="数字认证">
+      <i class="fa fa-chevron-left"></i> 数字认证
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2022/07/31/ACARS-5/" rel="next" title="航空甚高频ACARS信号调制（5）—— 再谈SDR">
-      航空甚高频ACARS信号调制（5）—— 再谈SDR <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -397,7 +345,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D"><span class="nav-number">1.</span> <span class="nav-text">数字签名</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">什么是数字签名？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D%E7%89%B9%E7%82%B9"><span class="nav-number">1.2.</span> <span class="nav-text">数字签名特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D%E7%9A%84%E5%8A%9F%E8%83%BD"><span class="nav-number">1.3.</span> <span class="nav-text">数字签名的功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D%E8%BF%87%E7%A8%8B"><span class="nav-number">1.4.</span> <span class="nav-text">数字签名过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E5%AD%97%E8%AF%81%E4%B9%A6"><span class="nav-number">2.</span> <span class="nav-text">数字证书</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%95%B0%E5%AD%97%E8%AF%81%E4%B9%A6"><span class="nav-number">2.1.</span> <span class="nav-text">什么是数字证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PKI%EF%BC%88%E5%85%AC%E9%92%A5%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">PKI（公钥基础设施）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%AD%97%E8%AF%81%E4%B9%A6%E7%9A%84%E5%86%85%E5%AE%B9"><span class="nav-number">2.3.</span> <span class="nav-text">数字证书的内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Https%E4%B8%AD%E7%9A%84%E6%95%B0%E5%AD%97%E8%AF%81%E4%B9%A6%E9%A2%81%E5%8F%91%E8%BF%87%E7%A8%8B"><span class="nav-number">2.4.</span> <span class="nav-text">Https中的数字证书颁发过程</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HackRF-One"><span class="nav-number">1.</span> <span class="nav-text">HackRF One</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RTL-SDR"><span class="nav-number">2.</span> <span class="nav-text">RTL-SDR</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -558,6 +506,61 @@
   
 
   
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
 
   
 

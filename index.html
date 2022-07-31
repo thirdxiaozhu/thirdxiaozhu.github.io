@@ -132,7 +132,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">6</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">7</span></a>
 
   </li>
   </ul>
@@ -158,6 +158,93 @@
 
           <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/07/31/ACARS-5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/1495_1644831403_hd.jpeg">
+      <meta itemprop="name" content="thirdxiaozhu">
+      <meta itemprop="description" content="嘎">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="鹅窝">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/07/31/ACARS-5/" class="post-title-link" itemprop="url">航空甚高频ACARS信号调制（5）—— 再谈SDR</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-07-31 22:54:11 / 修改时间：23:36:44" itemprop="dateCreated datePublished" datetime="2022-07-31T22:54:11+08:00">2022-07-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%80%9A%E4%BF%A1/" itemprop="url" rel="index"><span itemprop="name">通信</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在系列博客（3）中，初步介绍了软件定义无线电中两款便宜、可靠的SDR设备：HackRF One、RTL-SDR，并给出了gnuradio中简单模块的使用。本篇将在此基础上更进一步，介绍SDR设备和软件所使用的数据格式，并给出相应分析数据的python代码。</p>
+<h2 id="HackRF-One"><a href="#HackRF-One" class="headerlink" title="HackRF One"></a>HackRF One</h2><p>在2014年的版本更新中，HackRF所使用的数据类型从无符号8bit整型（uint8）改为有符号8bit整型（int8），此后版本一致沿用此类型。HackRF处理的数据由IQ样本交替构成，即，两个样本为一组，第一个样本为复数实部I，第二个样本是复数虚部Q，这也解释了为什么在使用hackrf_transfer发送或接收数据时，每秒处理的样本数为采样率的两倍。</p>
+<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/5/hackrf_trans.png" alt="两倍"></p>
+<p>需要注意，HackRF数据以补码形式进行存储。</p>
+<p>下面给出存储HackRF数据代码。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">intToBin</span>(<span class="params">number</span>):</span><br><span class="line">    <span class="keyword">if</span>(number&gt;=<span class="number">0</span>):</span><br><span class="line">        b=<span class="built_in">bin</span>(number)</span><br><span class="line">        b = <span class="string">&#x27;0&#x27;</span> * (<span class="number">8</span>+<span class="number">2</span> - <span class="built_in">len</span>(b)) + b</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        b=<span class="number">2</span>**(<span class="number">8</span>)+number</span><br><span class="line">        b=<span class="built_in">bin</span>(b)</span><br><span class="line">        b = <span class="string">&#x27;1&#x27;</span> * (<span class="number">8</span>+<span class="number">2</span> - <span class="built_in">len</span>(b)) + b    <span class="comment">#注意这里算出来的结果是补码</span></span><br><span class="line">    b=b.replace(<span class="string">&quot;0b&quot;</span>,<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">    b=b.replace(<span class="string">&#x27;-&#x27;</span>,<span class="string">&#x27;&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> b</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">int8_to_unsigned_hex</span>(<span class="params">integer</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">chr</span>(integer).encode(<span class="string">&#x27;latin1&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">iqFile = <span class="built_in">open</span>(<span class="string">&quot;/home/jiaxv/inoproject/msk/acarsgen/int8.cs8&quot;</span>,<span class="string">&quot;wb&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(I)):</span><br><span class="line">    <span class="comment">####   补码  ###</span></span><br><span class="line">    i_complement = intToBin(<span class="built_in">int</span>(I[i]))</span><br><span class="line">    q_complement = intToBin(<span class="built_in">int</span>(Q[i]))</span><br><span class="line">    iqFile.write(int8_to_unsigned_hex(<span class="built_in">int</span>(i_complement, <span class="number">2</span>)))</span><br><span class="line">    iqFile.write(int8_to_unsigned_hex(<span class="built_in">int</span>(q_complement, <span class="number">2</span>)))</span><br><span class="line"></span><br><span class="line">iqFile.close()</span><br></pre></td></tr></table></figure>
+<h2 id="RTL-SDR"><a href="#RTL-SDR" class="headerlink" title="RTL-SDR"></a>RTL-SDR</h2>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
       
   
   
@@ -378,7 +465,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-30 14:02:37" itemprop="dateModified" datetime="2022-03-30T14:02:37+08:00">2022-03-30</time>
+                <time title="修改时间：2022-07-31 23:13:45" itemprop="dateModified" datetime="2022-07-31T23:13:45+08:00">2022-07-31</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -396,7 +483,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>637</span>
+              <span>662</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -458,7 +545,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/02/16/ACARS-3/" class="post-title-link" itemprop="url">航空甚高频ACARS信号调制（3）—— 软件定义无线电</a>
+            <a href="/2022/02/16/ACARS-3/" class="post-title-link" itemprop="url">航空甚高频ACARS信号调制（3）—— 初识软件定义无线电</a>
         </h2>
 
         <div class="post-meta">
@@ -475,7 +562,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-02-19 18:08:53" itemprop="dateModified" datetime="2022-02-19T18:08:53+08:00">2022-02-19</time>
+                <time title="修改时间：2022-07-31 22:57:01" itemprop="dateModified" datetime="2022-07-31T22:57:01+08:00">2022-07-31</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -795,7 +882,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">7</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -861,12 +948,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">15k</span>
+    <span title="站点总字数">17k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">14 分钟</span>
+    <span title="站点阅读时长">15 分钟</span>
 </div>
 
         
