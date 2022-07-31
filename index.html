@@ -378,7 +378,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-04 08:02:30" itemprop="dateModified" datetime="2022-03-04T08:02:30+08:00">2022-03-04</time>
+                <time title="修改时间：2022-03-30 14:02:37" itemprop="dateModified" datetime="2022-03-30T14:02:37+08:00">2022-03-30</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -396,7 +396,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>147</span>
+              <span>637</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -415,10 +415,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="ACARS调制和MSK调制的不同"><a href="#ACARS调制和MSK调制的不同" class="headerlink" title="ACARS调制和MSK调制的不同"></a>ACARS调制和MSK调制的不同</h2><p>广义上的MSK信号在一个码元周期内，高频代表“1”，低频代表“0”。而ACARS信号由频率和相位共同构成信息。即：在2400Hz时，初相为0表示为“1”；初相为$\pi$表示为“0”，在1200Hz时，初相为0表示为“0”，初相为$\pi$表示为“1”。</p>
-<p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/ACARS_freq.png" alt="ACARS频率"></p>
-<p>未完待续</p>
-
+          <h2 id="ACARS调制和MSK调制的不同"><a href="#ACARS调制和MSK调制的不同" class="headerlink" title="ACARS调制和MSK调制的不同"></a>ACARS调制和MSK调制的不同</h2><h3 id="差分编码"><a href="#差分编码" class="headerlink" title="差分编码"></a>差分编码</h3><p>常规MSK在调制之前需要对比特流进行差分编码（NRZI编码），具体计算方式为$b_{n}=a_{n} \odot b_{n-1}$。在解调之后，需要进行NRZI编码的逆过程：$a_{n}=b_{n} \odot b_{n-1}$ ，即可得到原始的比特流。</p>
+<p>在ACARS的调制解调中，过程相反，即：在调制时使用$a_{n}=b_{n} \odot b_{n-1}$，在解调时进行NRZI编码，$b_{n}=a_{n} \odot b_{n-1}$。<br><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/NRZI.png" alt="NRZI"></p>
+<p>这里的具体关系转换推导可参考<a target="_blank" rel="noopener" href="https://kns.cnki.net/kcms/detail/detail.aspx?dbcode=CJFD&amp;dbname=CJFD2012&amp;filename=HDZJ201208005&amp;uniplatform=NZKPT&amp;v=XT6xb1GtzIJDLuLZKUCp4GqZOdO2A6PSFP8NKMJOID6Zlv38kexJbpfZZn2jrQyN">基于MSK的地空数据链调制解调方法 ——中国知网</a></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/02/19/ACARS-4/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -838,6 +845,9 @@
         
 
         
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">津ICP备2022004082号-1 </a>
+      <img src="http://www.beian.gov.cn/portal/download" style="display: inline-block;">
+  </div>
 
 <div class="copyright">
   
