@@ -20,16 +20,16 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="在系列博客（3）中，初步介绍了软件定义无线电中两款便宜、可靠的SDR设备：HackRF One、RTL-SDR，并给出了gnuradio中简单模块的使用。本篇将在此基础上更进一步，介绍SDR设备和软件所使用的数据格式，并给出相应分析数据的python代码。 HackRF One在2014年的版本更新中，HackRF所使用的数据类型从无符号8bit整型（uint8）改为有符号8bit整型（int8）">
+  <meta name="description" content="在系列博客（3）中，初步介绍了软件定义无线电中两款便宜、可靠的SDR设备：HackRF One、RTL-SDR，并给出了gnuradio中简单模块的使用。本篇将在此基础上更进一步，介绍SDR设备和软件所使用的数据格式，并给出相应分析数据的python代码。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="航空甚高频ACARS信号调制（5）—— 再谈SDR">
 <meta property="og:url" content="http://example.com/2022/07/31/ACARS-5/index.html">
 <meta property="og:site_name" content="鹅窝">
-<meta property="og:description" content="在系列博客（3）中，初步介绍了软件定义无线电中两款便宜、可靠的SDR设备：HackRF One、RTL-SDR，并给出了gnuradio中简单模块的使用。本篇将在此基础上更进一步，介绍SDR设备和软件所使用的数据格式，并给出相应分析数据的python代码。 HackRF One在2014年的版本更新中，HackRF所使用的数据类型从无符号8bit整型（uint8）改为有符号8bit整型（int8）">
+<meta property="og:description" content="在系列博客（3）中，初步介绍了软件定义无线电中两款便宜、可靠的SDR设备：HackRF One、RTL-SDR，并给出了gnuradio中简单模块的使用。本篇将在此基础上更进一步，介绍SDR设备和软件所使用的数据格式，并给出相应分析数据的python代码。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/5/hackrf_trans.png">
 <meta property="article:published_time" content="2022-07-31T14:54:11.000Z">
-<meta property="article:modified_time" content="2022-07-31T15:36:44.221Z">
+<meta property="article:modified_time" content="2022-07-31T15:37:21.008Z">
 <meta property="article:author" content="thirdxiaozhu">
 <meta property="article:tag" content="通信">
 <meta property="article:tag" content="无线电">
@@ -195,7 +195,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-07-31 22:54:11 / 修改时间：23:36:44" itemprop="dateCreated datePublished" datetime="2022-07-31T22:54:11+08:00">2022-07-31</time>
+              <time title="创建时间：2022-07-31 22:54:11 / 修改时间：23:37:21" itemprop="dateCreated datePublished" datetime="2022-07-31T22:54:11+08:00">2022-07-31</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -240,6 +240,7 @@
 
       
         <p>在系列博客（3）中，初步介绍了软件定义无线电中两款便宜、可靠的SDR设备：HackRF One、RTL-SDR，并给出了gnuradio中简单模块的使用。本篇将在此基础上更进一步，介绍SDR设备和软件所使用的数据格式，并给出相应分析数据的python代码。</p>
+<span id="more"></span>
 <h2 id="HackRF-One"><a href="#HackRF-One" class="headerlink" title="HackRF One"></a>HackRF One</h2><p>在2014年的版本更新中，HackRF所使用的数据类型从无符号8bit整型（uint8）改为有符号8bit整型（int8），此后版本一致沿用此类型。HackRF处理的数据由IQ样本交替构成，即，两个样本为一组，第一个样本为复数实部I，第二个样本是复数虚部Q，这也解释了为什么在使用hackrf_transfer发送或接收数据时，每秒处理的样本数为采样率的两倍。</p>
 <p><img src="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/blog/5/hackrf_trans.png" alt="两倍"></p>
 <p>需要注意，HackRF数据以补码形式进行存储。</p>
