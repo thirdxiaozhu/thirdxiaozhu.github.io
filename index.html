@@ -132,7 +132,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">7</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">8</span></a>
 
   </li>
   </ul>
@@ -158,6 +158,119 @@
 
           <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://goosenest.xyz/2022/08/17/portapack-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://0718centos82-1302841739.cos.ap-shanghai.myqcloud.com/1495_1644831403_hd.jpeg">
+      <meta itemprop="name" content="thirdxiaozhu">
+      <meta itemprop="description" content="嘎">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="鹅窝">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/17/portapack-1/" class="post-title-link" itemprop="url">源码编译portpack</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-08-17 02:59:06 / 修改时间：03:24:45" itemprop="dateCreated datePublished" datetime="2022-08-17T02:59:06+08:00">2022-08-17</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="源码编译PortaPack"><a href="#源码编译PortaPack" class="headerlink" title="源码编译PortaPack"></a>源码编译PortaPack</h2><ul>
+<li><p>在编译PortaPack之前，有一些重要依赖需要安装：</p>
+<ul>
+<li><p>arm-none-eabi-gcc</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd <span class="regexp">/opt         #进入到opt路径下（不一定是/</span>opt，可以使其他路径）</span><br><span class="line">sudo wget https:<span class="regexp">//</span>developer.arm.com<span class="regexp">/-/m</span>edia<span class="regexp">/Files/</span>downloads<span class="regexp">/gnu-rm/</span><span class="number">9</span>-<span class="number">2019</span>q4<span class="regexp">/RC2.1/g</span>cc-arm-none-eabi-<span class="number">9</span>-<span class="number">2019</span>-q4-major-x86_64-linux.tar.bz2        <span class="comment">#下载软件包</span></span><br><span class="line">sudo tar xjf gcc-arm-none-eabi-<span class="number">9</span>-<span class="number">2019</span>-q4-major-x86_64-linux.tar.bz2         <span class="comment">#解压软件包</span></span><br></pre></td></tr></table></figure>
+<p>那么解压后可执行二进制文件就在/opt/gcc-arm-none-eabi-9-2019-q4-major/bin/目录下，在环境变量中添加这条路径即可。<br>/home/xxxx/.bashrc（用户）或/etc/profile(全局)：</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PATH=<span class="variable">$PATH</span><span class="symbol">:/opt/gcc-arm-none-eabi-</span><span class="number">9</span><span class="number">-2019</span>-q4-major/bin</span><br></pre></td></tr></table></figure>
+<p>保存并退出编辑，刷新一下环境变量</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">source</span> .bashrc 或 sorce <span class="regexp">/etc/</span>profile</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>dfu util</p>
+<p>直接apt安装即可</p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>首先从mayhem仓库中拉取源码：<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:<span class="regexp">//gi</span>thub.com<span class="regexp">/eried/</span>portapack-mayhem.git</span><br></pre></td></tr></table></figure>
+需要注意，拉取完之后，一些关于hackrf的子模块，并未一同下载，需要：</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd portapack-mayhem  <span class="comment">#进入拉取路径</span></span><br><span class="line">git submodule update --init --recursive  <span class="comment">#完成子模块下载 </span></span><br><span class="line">sed -i <span class="string">&#x27;s/env python/env python3/g&#x27;</span> hackrf<span class="regexp">/firmware/</span>libopencm3<span class="regexp">/scripts/i</span>rq2nvic_h   <span class="comment">#更改某一python版本，从python2转到python3</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>然后进行编译步骤（缺啥补啥就行）：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> build</span><br><span class="line"><span class="keyword">cd</span> build</span><br><span class="line">cmake ..</span><br><span class="line"><span class="keyword">make</span> firmwire -j4</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装步骤<br>make结束后会在build下面生成一个firmwire文件夹，cd进去会看见一个.bin结尾的二进制文件，直接刷到hackrf中：</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">hackrf_spiflash</span> -w portapack-h1_h2-mayhem.bin</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>至此，安装结束</p>
+<h2 id="刷砖之后的解决办法"><a href="#刷砖之后的解决办法" class="headerlink" title="刷砖之后的解决办法"></a>刷砖之后的解决办法</h2><p>最开始由于gcc版本过高导致编译之后的固件刷进hackrf之后就变砖了，经过尝试，得到了一种可行的拯救方法。</p>
+<p>如果把.bin刷进hackrf后，只有3v3和RF灯亮，或者USB、TX、RX灯亮了但很微弱，很不幸，你的hackrf已经变砖了。首先，需要从hackrf仓库中找到2018.1的稳定版本，解压后：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> firmwire-bin</span><br></pre></td></tr></table></figure><br>因为此时你的hackrf已经变砖了，所以不能直接刷hackrf-one-usb.bin，需要进入DFU引导模式，开启方法为：</p>
+<ul>
+<li>首先同时按住RESET和DFU按钮，一秒后松开RESET，等一小会松开DFU，即进入了DFU模式</li>
+</ul>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">dfu-util</span> <span class="built_in">--device</span> <span class="string">1fc9:000c </span><span class="built_in">--alt</span> <span class="string">0</span> <span class="built_in">--download</span> <span class="string">hackrf_one_usb</span>.<span class="string">dfu</span>   <span class="comment">#刷进hackrf</span></span><br></pre></td></tr></table></figure>
+<p>如果成功进入DFU模式，会出现一个进度条，否则失败，需要重新按按钮。<br>成功后，1V8灯即亮起，直接刷入固件：<br><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">hackrf_spiflash</span> -w hackrf_one_usb.bin</span><br></pre></td></tr></table></figure><br>成功拯救你的砖头！！</p>
+<p>然后再刷入之前编译好的portpack固件即可。</p>
+<p>一定要按我的方法安装arm-gcc!!!</p>
+<p>一定要按我的方法安装arm-gcc!!!</p>
+<p>一定要按我的方法安装arm-gcc!!!</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
       
   
   
@@ -884,7 +997,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -950,12 +1063,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">17k</span>
+    <span title="站点总字数">18k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">15 分钟</span>
+    <span title="站点阅读时长">16 分钟</span>
 </div>
 
         
